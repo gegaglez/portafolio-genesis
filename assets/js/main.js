@@ -108,6 +108,7 @@
       // FormSubmit tarda en responder: se confirma de inmediato y el envío sigue en segundo plano
       note.textContent = '¡Gracias! Tu mensaje se envió correctamente. Te responderé pronto.';
       form.reset();
+      if (typeof gtag === 'function') gtag('event', 'generate_lead', { form_name: 'contacto' });
 
       fetch('https://formsubmit.co/ajax/1b17772f4068a6954eafe1781fccb24f', {
         method: 'POST',
