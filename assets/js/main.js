@@ -86,22 +86,45 @@
     update();
   });
 
-  // Formulario de contacto: abre el correo con el mensaje listo
+  // Formulario de contacto: envía el mensaje directo al correo mediante FormSubmit
   const form = document.querySelector('.form');
   if (form) {
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const note = form.querySelector('.form__note');
+      const submit = form.querySelector('button[type="submit"] .btn__front');
       if (!form.checkValidity()) {
         form.reportValidity();
         return;
       }
       const data = new FormData(form);
-      const subject = `Nuevo proyecto — ${data.get('nombre')}`;
-      const body = `Nombre: ${data.get('nombre')}\nCorreo: ${data.get('correo')}\n\n${data.get('mensaje')}`;
-      window.location.href = `mailto:genesisgaglez@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      note.textContent = '¡Gracias! Se abrirá tu aplicación de correo para enviar el mensaje.';
-      form.reset();
+      if (data.get('_honey')) return; // campo trampa para bots
+
+      submit.textContent = 'Enviando…';
+      note.textContent = '';
+      try {
+        const res = await fetch('https://formsubmit.co/ajax/genesisgaglez@gmail.com', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            Nombre: data.get('nombre'),
+            Correo: data.get('correo'),
+            Mensaje: data.get('mensaje'),
+            _replyto: data.get('correo'),
+            _subject: `Nuevo mensaje del portafolio — ${data.get('nombre')}`,
+            _template: 'table',
+            _captcha: 'false',
+          }),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || String(json.success) === 'false') throw new Error(json.message);
+        note.textContent = '¡Gracias! Tu mensaje se envió correctamente. Te responderé pronto.';
+        form.reset();
+      } catch (err) {
+        note.textContent = 'No se pudo enviar el mensaje. Inténtalo de nuevo o escríbeme a genesisgaglez@gmail.com.';
+      } finally {
+        submit.textContent = 'Enviar';
+      }
     });
   }
 })();
