@@ -103,7 +103,7 @@
       submit.textContent = 'Enviando…';
       note.textContent = '';
       try {
-        const res = await fetch('https://formsubmit.co/ajax/genesisgaglez@gmail.com', {
+        const res = await fetch('https://formsubmit.co/ajax/1b17772f4068a6954eafe1781fccb24f', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify({
@@ -121,7 +121,7 @@
         note.textContent = '¡Gracias! Tu mensaje se envió correctamente. Te responderé pronto.';
         form.reset();
       } catch (err) {
-        note.textContent = 'No se pudo enviar el mensaje. Inténtalo de nuevo o escríbeme a genesisgaglez@gmail.com.';
+        note.textContent = 'No se pudo enviar el mensaje. Inténtalo de nuevo en unos minutos.';
       } finally {
         submit.textContent = 'Enviar';
       }
