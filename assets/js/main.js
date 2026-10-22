@@ -138,3 +138,11 @@
     });
   }
 })();
+
+// Correo del pie de página: se arma al cargar para que los bots no lo lean del código
+document.querySelectorAll('.footer__mail[data-u]').forEach((a) => {
+  const rev = (s) => s.split('').reverse().join('');
+  const mail = `${rev(a.dataset.u)}@${rev(a.dataset.d)}`;
+  a.href = `mailto:${mail}`;
+  a.textContent = mail;
+});

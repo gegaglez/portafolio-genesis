@@ -129,7 +129,7 @@ button { font: inherit; color: inherit; }
 .header__inner { height: 100%; display: flex; align-items: center; justify-content: space-between; }
 .logo { font-size: 22px; line-height: 1; font-weight: 600; letter-spacing: -0.03em; }
 .nav { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 30px; }
-.nav a { font-size: 18px; line-height: 18px; letter-spacing: -0.03em; position: relative; }
+.nav a { font-size: 18px; line-height: 18px; letter-spacing: -0.03em; position: relative; white-space: nowrap; }
 .nav a::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 2px;
   background: var(--dark); transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ease);
@@ -397,6 +397,12 @@ main { padding-top: var(--header-h); }
    ========================================================== */
 @media (max-width: 1199px) {
   .nav { gap: 20px; }
+}
+@media (max-width: 960px) {
+  .nav { gap: 14px; }
+  .nav a { font-size: 16px; }
+}
+@media (max-width: 1199px) {
   .hero .container { min-height: 0; padding: 80px 0; }
   .h1 { font-size: 52px; line-height: 58px; }
   .hero__media { width: 380px; height: 450px; }
