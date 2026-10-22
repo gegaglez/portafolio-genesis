@@ -89,42 +89,51 @@
   // Formulario de contacto: envía el mensaje directo al correo mediante FormSubmit
   const form = document.querySelector('.form');
   if (form) {
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
       const note = form.querySelector('.form__note');
-      const submit = form.querySelector('button[type="submit"] .btn__front');
+      const fail = 'No se pudo enviar el mensaje. Inténtalo de nuevo en unos minutos.';
       if (!form.checkValidity()) {
         form.reportValidity();
         return;
       }
       const data = new FormData(form);
       if (data.get('_honey')) return; // campo trampa para bots
-
-      submit.textContent = 'Enviando…';
-      note.textContent = '';
-      try {
-        const res = await fetch('https://formsubmit.co/ajax/1b17772f4068a6954eafe1781fccb24f', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({
-            Nombre: data.get('nombre'),
-            Correo: data.get('correo'),
-            Mensaje: data.get('mensaje'),
-            _replyto: data.get('correo'),
-            _subject: `Nuevo mensaje del portafolio — ${data.get('nombre')}`,
-            _template: 'table',
-            _captcha: 'false',
-          }),
-        });
-        const json = await res.json().catch(() => ({}));
-        if (!res.ok || String(json.success) === 'false') throw new Error(json.message);
-        note.textContent = '¡Gracias! Tu mensaje se envió correctamente. Te responderé pronto.';
-        form.reset();
-      } catch (err) {
-        note.textContent = 'No se pudo enviar el mensaje. Inténtalo de nuevo en unos minutos.';
-      } finally {
-        submit.textContent = 'Enviar';
+      if (!navigator.onLine) {
+        note.textContent = fail;
+        return;
       }
+      const values = { nombre: data.get('nombre'), correo: data.get('correo'), mensaje: data.get('mensaje') };
+
+      // FormSubmit tarda en responder: se confirma de inmediato y el envío sigue en segundo plano
+      note.textContent = '¡Gracias! Tu mensaje se envió correctamente. Te responderé pronto.';
+      form.reset();
+
+      fetch('https://formsubmit.co/ajax/1b17772f4068a6954eafe1781fccb24f', {
+        method: 'POST',
+        keepalive: true, // el envío continúa aunque la persona cierre o cambie de página
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          Nombre: values.nombre,
+          Correo: values.correo,
+          Mensaje: values.mensaje,
+          _replyto: values.correo,
+          _subject: `Nuevo mensaje del portafolio — ${values.nombre}`,
+          _template: 'table',
+          _captcha: 'false',
+        }),
+      })
+        .then(async (res) => {
+          const json = await res.json().catch(() => ({}));
+          if (!res.ok || String(json.success) === 'false') throw new Error(json.message);
+        })
+        .catch(() => {
+          // Si falla, se avisa y se devuelve el texto para que no se pierda
+          form.elements.nombre.value = values.nombre;
+          form.elements.correo.value = values.correo;
+          form.elements.mensaje.value = values.mensaje;
+          note.textContent = fail;
+        });
     });
   }
 })();
